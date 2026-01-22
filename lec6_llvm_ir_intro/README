@@ -1,0 +1,23 @@
+1. To compile the llvm_parser IR run:
+
+make
+
+2. To generate the LLVM_IR file that has to be passed as command line argument to llvm_parser run:
+
+make llvm_file
+
+3. To run use the following command:
+./llvm_parser test.ll
+
+4. Declarations of the different LLVM C API that we will be using in this project can be found in:
+
+/usr/include/llvm-c-17/llvm-c/Core.h
+
+4. Online doxygen document corresponding to LLVM C API:
+
+http://llvm.org/doxygen/group__LLVMC.html
+
+5. LLVM instruction set reference manual, this will help you understand the various instructions in LLVM IR file.
+
+https://llvm.org/docs/LangRef.html
+
