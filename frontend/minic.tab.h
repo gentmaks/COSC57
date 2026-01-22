@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
+#ifndef YY_YY_MINIC_TAB_H_INCLUDED
+# define YY_YY_MINIC_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -57,18 +57,7 @@ extern int yydebug;
     NUM = 258,                     /* NUM  */
     NAME = 259,                    /* NAME  */
     PRINT = 260,                   /* PRINT  */
-    RETURN = 261,                  /* RETURN  */
-    EXTERN = 262,                  /* EXTERN  */
-    VOID = 263,                    /* VOID  */
-    INT = 264,                     /* INT  */
-    IF = 265,                      /* IF  */
-    ELSE = 266,                    /* ELSE  */
-    WHILE = 267,                   /* WHILE  */
-    READ = 268,                    /* READ  */
-    EQ = 269,                      /* EQ  */
-    NEQ = 270,                     /* NEQ  */
-    LE = 271,                      /* LE  */
-    GE = 272                       /* GE  */
+    RETURN = 261                   /* RETURN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -82,7 +71,7 @@ union YYSTYPE
     int num;
     char *str;
 
-#line 86 "y.tab.h"
+#line 75 "minic.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -97,4 +86,4 @@ extern YYSTYPE yylval;
 int yyparse (void);
 
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#endif /* !YY_YY_MINIC_TAB_H_INCLUDED  */
