@@ -1,6 +1,1 @@
-x = 1 + 2 * 3;
-y = 3;
-z = y;
-dummy = x + z;
-print(x);
-return;
+x = 1 + 3;

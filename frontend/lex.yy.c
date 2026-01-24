@@ -476,11 +476,12 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "minic.l"
 #line 2 "minic.l"
-#include "y.tab.h"
 #include <stdlib.h>
 #include <string.h>
-#line 482 "lex.yy.c"
+#include "ast.h"
+#include "minic.tab.h"
 #line 483 "lex.yy.c"
+#line 484 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -697,10 +698,10 @@ YY_DECL
 		}
 
 	{
-#line 7 "minic.l"
+#line 8 "minic.l"
 
 
-#line 703 "lex.yy.c"
+#line 704 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -759,96 +760,96 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 9 "minic.l"
+#line 10 "minic.l"
 { return EXTERN; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 10 "minic.l"
+#line 11 "minic.l"
 { return VOID; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 11 "minic.l"
+#line 12 "minic.l"
 { return INT; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 12 "minic.l"
+#line 13 "minic.l"
 { return IF; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 13 "minic.l"
+#line 14 "minic.l"
 { return ELSE; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 14 "minic.l"
+#line 15 "minic.l"
 { return WHILE; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 15 "minic.l"
+#line 16 "minic.l"
 { return RETURN; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 16 "minic.l"
+#line 17 "minic.l"
 { return PRINT; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 17 "minic.l"
+#line 18 "minic.l"
 { return READ; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 18 "minic.l"
+#line 19 "minic.l"
 { return EQ; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 19 "minic.l"
+#line 20 "minic.l"
 { return NEQ; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 20 "minic.l"
+#line 21 "minic.l"
 { return LE; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 21 "minic.l"
+#line 22 "minic.l"
 { return GE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 22 "minic.l"
+#line 23 "minic.l"
 { yylval.num = atoi(yytext); return NUM; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 23 "minic.l"
+#line 24 "minic.l"
 { yylval.str = strdup(yytext); return NAME; }
 	YY_BREAK
 case 16:
 /* rule 16 can match eol */
 YY_RULE_SETUP
-#line 24 "minic.l"
+#line 25 "minic.l"
 { /* skip whitespace */ }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 25 "minic.l"
+#line 26 "minic.l"
 { return yytext[0]; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 27 "minic.l"
+#line 28 "minic.l"
 ECHO;
 	YY_BREAK
-#line 851 "lex.yy.c"
+#line 852 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1853,7 +1854,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 27 "minic.l"
+#line 28 "minic.l"
 
 
 int yywrap() {

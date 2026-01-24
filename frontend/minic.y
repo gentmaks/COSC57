@@ -1,13 +1,17 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
+#include "ast.h"
 void yyerror(char *s);
 int yylex();
+astNode *rootNode;
 %}
 
 %union {
     int num;
     char *str;
+    astNode *node;
+    std::vector<astNode*> *statement_list;
 }
 
 %token <num> NUM
@@ -15,44 +19,66 @@ int yylex();
 %token PRINT RETURN
 %token EXTERN VOID INT IF ELSE WHILE READ
 %token EQ NEQ LE GE
+%type <node> expr
+%type <node> statement
+%type <statement_list> statement_list
+%type <node> block
 
 %left '+' '-'
 %left '*' '/'
-%start statement_list
+
+%start block
 %%
+
+block: 
+    statement_list
+        { $$ = createBlock($1); }
+    | '{' statement_list '}' 
+        { $$ = createBlock($2); }
+    ;
 
 statement_list:
     statement_list statement
-        { printf("stmt_list: append statement\n"); }
+        { $1->push_back($2); }
     | statement
-        { printf("stmt_list: single statement\n"); }
+        { $$->push_back($1); }
     ;
 
 statement: 
     NAME '=' expr ';'
-        { printf("statement: assignment to %s\n", $1); }
+        { $$ = createAsgn(createVar($1), $3); }
     | PRINT '(' expr ')' ';'
-        { printf("statement: print\n"); }
+        { $$ = createCall("print", $3); }
     | RETURN expr ';'
-        { printf("statement: return\n"); }
+        { $$ = createRet($2); }
     | RETURN ';'
-        {printf("Emptry return\n"); }
+        { $$ = createRet(NULL); }
     ;
 
-expr: expr '+' expr
-        { printf("expr: add\n"); }
+expr: 
+    expr '+' expr
+        { $$ = createBExpr($1, $3, add); }
     | expr '-' expr
-        { printf("expr: sub\n"); }
+        { $$ = createBExpr($1, $3, sub); }
     | expr '*' expr
-        { printf("expr: mul\n"); }
+        { $$ = createBExpr($1, $3, mul); }
     | expr '/' expr
-        { printf("expr: div\n"); }
+        { $$ = createBExpr($1, $3, divide); }
+    | '-' expr
+        { $$ = createUExpr($2, sub); }
+    | '+' expr
+        { $$ = createUExpr($2, add); }
+    | '*' expr
+        { $$ = createUExpr($2, mul); }
+    | '/' expr
+        { $$ = createUExpr($2, divide); }
     | '(' expr ')'
-        { printf("expr: paren\n"); }
+        { $$ = $2; }
     | NUM
-        { printf("expr: num %d\n", $1); }
+        { $$ = createCnst($1); }
     | NAME
-        { printf("expr: name %s\n", $1); }
+        { $$ = createVar($1); }
+    ;
 
 %%
 
