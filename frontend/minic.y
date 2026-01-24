@@ -27,57 +27,124 @@ astNode *rootNode;
 %left '+' '-'
 %left '*' '/'
 
-%start block
+%start statement_list
 %%
 
 block: 
-    statement_list
-        { $$ = createBlock($1); }
-    | '{' statement_list '}' 
-        { $$ = createBlock($2); }
+    '{' statement_list '}' 
+        { 
+        $$ = createBlock($2); 
+        printf("Statement List with brackets\n");
+        }
+    | statement_list
+        { 
+        $$ = createBlock($1); 
+        printf("Statement List\n");
+        }
     ;
 
 statement_list:
     statement_list statement
-        { $1->push_back($2); }
+        { 
+        $1->push_back($2); $$ = $1; 
+        printf("Statement appended to the statement list\n");
+        }
     | statement
-        { $$->push_back($1); }
+        { 
+        $$ = new std::vector<astNode*>; $$->push_back($1); 
+        printf("Statement created initial\n");
+        }
     ;
 
 statement: 
-    NAME '=' expr ';'
-        { $$ = createAsgn(createVar($1), $3); }
+    INT NAME ';'
+        { 
+        $$ = createDecl($2); 
+        printf("Declaration matched with type\n");
+        }
+    | INT NAME '=' expr ';'
+        { 
+        $$ = createAsgn(createDecl($2), $4); 
+        printf("Declaration with initialization\n");
+        }
+    | NAME '=' expr ';'
+        { 
+        $$ = createAsgn(createVar($1), $3); 
+        printf("Assignment created\n");
+        }
     | PRINT '(' expr ')' ';'
-        { $$ = createCall("print", $3); }
+        { 
+        $$ = createCall("print", $3); 
+        printf("Print function called\n");
+        }
     | RETURN expr ';'
-        { $$ = createRet($2); }
+        { 
+        $$ = createRet($2); 
+        printf("Return statement\n");
+        }
     | RETURN ';'
-        { $$ = createRet(NULL); }
+        { 
+        $$ = createRet(NULL); 
+        printf("Empty return statement\n");
+        }
     ;
 
-expr: 
+expr:
     expr '+' expr
-        { $$ = createBExpr($1, $3, add); }
+        { 
+        $$ = createBExpr($1, $3, add);
+        printf("add expression created\n");
+        }
     | expr '-' expr
-        { $$ = createBExpr($1, $3, sub); }
+        { 
+        $$ = createBExpr($1, $3, sub); 
+        printf("sub expression created\n");
+        }
     | expr '*' expr
-        { $$ = createBExpr($1, $3, mul); }
+        { 
+        $$ = createBExpr($1, $3, mul); 
+        printf("mul expression created\n");
+        }
     | expr '/' expr
-        { $$ = createBExpr($1, $3, divide); }
+        { 
+        $$ = createBExpr($1, $3, divide); 
+        printf("divide expression created\n");
+        }
     | '-' expr
-        { $$ = createUExpr($2, sub); }
+        { 
+        $$ = createUExpr($2, sub); 
+        printf("unary - expression created\n");
+        }
     | '+' expr
-        { $$ = createUExpr($2, add); }
+        { 
+        $$ = createUExpr($2, add); 
+        printf("unary + expression created\n");
+        }
     | '*' expr
-        { $$ = createUExpr($2, mul); }
+        { 
+        $$ = createUExpr($2, mul); 
+        printf("unary * expression created\n");
+        }
     | '/' expr
-        { $$ = createUExpr($2, divide); }
+        { 
+        $$ = createUExpr($2, divide); 
+        printf("unary / expression created\n");
+        }
     | '(' expr ')'
-        { $$ = $2; }
+        { 
+        $$ = $2; 
+        printf("expression inside parens\n");
+        }
     | NUM
-        { $$ = createCnst($1); }
+        { 
+        $$ = createCnst($1); 
+        printf("simple num matched\n");
+        }
     | NAME
-        { $$ = createVar($1); }
+        { 
+        $$ = createVar($1); 
+        printf("simple name matched\n");
+        }
     ;
 
 %%
