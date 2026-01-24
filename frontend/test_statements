@@ -1,6 +1,28 @@
 {
-    int y;
-    int x = 3;
-    b = x + 5;
-    c = x + y;
+    int x;
+    x = 3;
+
+    {
+
+    int x;
+    x = 3;
+    int y = x + 5;
+        {
+            int a;
+            int b;
+            int c;
+            a = 1;
+            b = 2;
+            c = 3;
+            int x = a + b +c;
+            int y = -b;
+        }
+    int c = x + y;
+    return (4 + 5);
+    
+    }
+    
+    int y = x + 5;
+    int c = x + y;
+    return (4 + 5);
 }

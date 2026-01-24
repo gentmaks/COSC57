@@ -27,7 +27,7 @@ astNode *rootNode;
 %left '+' '-'
 %left '*' '/'
 
-%start statement_list
+%start block
 %%
 
 block: 
@@ -86,6 +86,11 @@ statement:
         { 
         $$ = createRet(NULL); 
         printf("Empty return statement\n");
+        }
+    | '{' statement_list '}'
+        { 
+        $$ = createBlock($2); 
+        printf("Nested block\n");
         }
     ;
 
