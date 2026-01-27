@@ -1,5 +1,5 @@
 LLVMCODE = llvm_parser
-TEST = test
+TEST = class_minic
 
 LLVM_CONFIG := $(shell command -v llvm-config-17 2>/dev/null || command -v llvm-config 2>/dev/null)
 ifeq ($(LLVM_CONFIG),)
