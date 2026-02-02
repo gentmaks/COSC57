@@ -19,136 +19,205 @@ astNode *rootNode;
 %token PRINT RETURN
 %token EXTERN VOID INT IF ELSE WHILE READ
 %token EQ NEQ LE GE
-%type <node> expr
-%type <node> statement
-%type <statement_list> statement_list
+%type <node> program
+%type <node> extern_print extern_read
+%type <node> function param_opt
 %type <node> block
+%type <node> statement
+%type <node> assignment_rhs
+%type <node> expr
+%type <node> rel_expr
+%type <statement_list> decl_list
+%type <statement_list> stmt_list
 
 %left '+' '-'
 %left '*' '/'
+%right UMINUS
+%nonassoc IFX
+%nonassoc ELSE
 
-%start block
+%start program
 %%
 
-block: 
-    '{' statement_list '}' 
-        { 
-        $$ = createBlock($2); 
-        printf("Statement List with brackets\n");
-        }
-    | statement_list
-        { 
-        $$ = createBlock($1); 
-        printf("Statement List\n");
+program:
+    extern_print extern_read function
+        {
+        $$ = createProg($1, $2, $3);
+        rootNode = $$;
         }
     ;
 
-statement_list:
-    statement_list statement
-        { 
-        $1->push_back($2); $$ = $1; 
-        printf("Statement appended to the statement list\n");
-        }
-    | statement
-        { 
-        $$ = new std::vector<astNode*>; $$->push_back($1); 
-        printf("Statement created initial\n");
+extern_print:
+    EXTERN VOID PRINT '(' INT ')' ';'
+        {
+        $$ = createExtern("print");
         }
     ;
 
-statement: 
-    INT NAME ';'
-        { 
-        $$ = createDecl($2); 
-        printf("Declaration matched with type\n");
+extern_read:
+    EXTERN INT READ '(' ')' ';'
+        {
+        $$ = createExtern("read");
         }
-    | INT NAME '=' expr ';'
-        { 
-        $$ = createAsgn(createDecl($2), $4); 
-        printf("Declaration with initialization\n");
+    ;
+
+function:
+    INT NAME '(' param_opt ')' block
+        {
+        $$ = createFunc($2, $4, $6);
         }
-    | NAME '=' expr ';'
-        { 
-        $$ = createAsgn(createVar($1), $3); 
-        printf("Assignment created\n");
+    ;
+
+param_opt:
+    INT NAME
+        {
+        $$ = createVar($2);
+        }
+    | /* empty */
+        {
+        $$ = NULL;
+        }
+    ;
+
+block:
+    '{' decl_list stmt_list '}'
+        {
+        if ($2->empty()) {
+            delete $2;
+            $$ = createBlock($3);
+        } else {
+            $2->insert($2->end(), $3->begin(), $3->end());
+            delete $3;
+            $$ = createBlock($2);
+        }
+        }
+    ;
+
+decl_list:
+    decl_list INT NAME ';'
+        {
+        $1->push_back(createDecl($3));
+        $$ = $1;
+        }
+    | /* empty */
+        {
+        $$ = new std::vector<astNode*>;
+        }
+    ;
+
+stmt_list:
+    stmt_list statement
+        {
+        $1->push_back($2);
+        $$ = $1;
+        }
+    | /* empty */
+        {
+        $$ = new std::vector<astNode*>;
+        }
+    ;
+
+statement:
+    NAME '=' assignment_rhs ';'
+        {
+        $$ = createAsgn(createVar($1), $3);
         }
     | PRINT '(' expr ')' ';'
-        { 
-        $$ = createCall("print", $3); 
-        printf("Print function called\n");
+        {
+        $$ = createCall("print", $3);
         }
     | RETURN expr ';'
-        { 
-        $$ = createRet($2); 
-        printf("Return statement\n");
+        {
+        $$ = createRet($2);
         }
-    | RETURN ';'
-        { 
-        $$ = createRet(NULL); 
-        printf("Empty return statement\n");
+    | IF '(' rel_expr ')' statement %prec IFX
+        {
+        $$ = createIf($3, $5);
         }
-    | '{' statement_list '}'
-        { 
-        $$ = createBlock($2); 
-        printf("Nested block\n");
+    | IF '(' rel_expr ')' statement ELSE statement
+        {
+        $$ = createIf($3, $5, $7);
+        }
+    | WHILE '(' rel_expr ')' statement
+        {
+        $$ = createWhile($3, $5);
+        }
+    | block
+        {
+        $$ = $1;
+        }
+    ;
+
+assignment_rhs:
+    expr
+        {
+        $$ = $1;
+        }
+    | READ '(' ')'
+        {
+        $$ = createCall("read", NULL);
+        }
+    ;
+
+rel_expr:
+    expr '<' expr
+        {
+        $$ = createRExpr($1, $3, lt);
+        }
+    | expr '>' expr
+        {
+        $$ = createRExpr($1, $3, gt);
+        }
+    | expr LE expr
+        {
+        $$ = createRExpr($1, $3, le);
+        }
+    | expr GE expr
+        {
+        $$ = createRExpr($1, $3, ge);
+        }
+    | expr EQ expr
+        {
+        $$ = createRExpr($1, $3, eq);
+        }
+    | expr NEQ expr
+        {
+        $$ = createRExpr($1, $3, neq);
         }
     ;
 
 expr:
     expr '+' expr
-        { 
+        {
         $$ = createBExpr($1, $3, add);
-        printf("add expression created\n");
         }
     | expr '-' expr
-        { 
-        $$ = createBExpr($1, $3, sub); 
-        printf("sub expression created\n");
+        {
+        $$ = createBExpr($1, $3, sub);
         }
     | expr '*' expr
-        { 
-        $$ = createBExpr($1, $3, mul); 
-        printf("mul expression created\n");
+        {
+        $$ = createBExpr($1, $3, mul);
         }
     | expr '/' expr
-        { 
-        $$ = createBExpr($1, $3, divide); 
-        printf("divide expression created\n");
+        {
+        $$ = createBExpr($1, $3, divide);
         }
-    | '-' expr
-        { 
-        $$ = createUExpr($2, sub); 
-        printf("unary - expression created\n");
-        }
-    | '+' expr
-        { 
-        $$ = createUExpr($2, add); 
-        printf("unary + expression created\n");
-        }
-    | '*' expr
-        { 
-        $$ = createUExpr($2, mul); 
-        printf("unary * expression created\n");
-        }
-    | '/' expr
-        { 
-        $$ = createUExpr($2, divide); 
-        printf("unary / expression created\n");
+    | '-' expr %prec UMINUS
+        {
+        $$ = createUExpr($2, uminus);
         }
     | '(' expr ')'
-        { 
-        $$ = $2; 
-        printf("expression inside parens\n");
+        {
+        $$ = $2;
         }
     | NUM
-        { 
-        $$ = createCnst($1); 
-        printf("simple num matched\n");
+        {
+        $$ = createCnst($1);
         }
     | NAME
-        { 
-        $$ = createVar($1); 
-        printf("simple name matched\n");
+        {
+        $$ = createVar($1);
         }
     ;
 
