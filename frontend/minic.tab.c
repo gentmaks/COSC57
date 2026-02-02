@@ -113,6 +113,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ast.h"
+#include "semantic.h"
 void yyerror(char *s);
 int yylex();
 astNode *rootNode;
@@ -138,7 +139,7 @@ astNode *rootNode;
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 10 "minic.y"
+#line 11 "minic.y"
 {
     int num;
     char *str;
@@ -146,7 +147,7 @@ typedef union YYSTYPE
     std::vector<astNode*> *statement_list;
 }
 /* Line 193 of yacc.c.  */
-#line 150 "minic.tab.c"
+#line 151 "minic.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -159,7 +160,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 163 "minic.tab.c"
+#line 164 "minic.tab.c"
 
 #ifdef short
 # undef short
@@ -459,10 +460,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    43,    43,    51,    58,    65,    72,    77,    83,    97,
-     103,   109,   115,   121,   125,   129,   133,   137,   141,   145,
-     152,   156,   163,   167,   171,   175,   179,   183,   190,   194,
-     198,   202,   206,   210,   214,   218
+       0,    44,    44,    52,    59,    66,    73,    78,    84,    98,
+     104,   110,   116,   122,   126,   130,   134,   138,   142,   146,
+     153,   157,   164,   168,   172,   176,   180,   184,   191,   195,
+     199,   203,   207,   211,   215,   219
 };
 #endif
 
@@ -1422,7 +1423,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 44 "minic.y"
+#line 45 "minic.y"
     {
         (yyval.node) = createProg((yyvsp[(1) - (3)].node), (yyvsp[(2) - (3)].node), (yyvsp[(3) - (3)].node));
         rootNode = (yyval.node);
@@ -1430,42 +1431,42 @@ yyreduce:
     break;
 
   case 3:
-#line 52 "minic.y"
+#line 53 "minic.y"
     {
         (yyval.node) = createExtern("print");
         ;}
     break;
 
   case 4:
-#line 59 "minic.y"
+#line 60 "minic.y"
     {
         (yyval.node) = createExtern("read");
         ;}
     break;
 
   case 5:
-#line 66 "minic.y"
+#line 67 "minic.y"
     {
         (yyval.node) = createFunc((yyvsp[(2) - (6)].str), (yyvsp[(4) - (6)].node), (yyvsp[(6) - (6)].node));
         ;}
     break;
 
   case 6:
-#line 73 "minic.y"
+#line 74 "minic.y"
     {
         (yyval.node) = createVar((yyvsp[(2) - (2)].str));
         ;}
     break;
 
   case 7:
-#line 77 "minic.y"
+#line 78 "minic.y"
     {
         (yyval.node) = NULL;
         ;}
     break;
 
   case 8:
-#line 84 "minic.y"
+#line 85 "minic.y"
     {
         if ((yyvsp[(2) - (4)].statement_list)->empty()) {
             delete (yyvsp[(2) - (4)].statement_list);
@@ -1479,7 +1480,7 @@ yyreduce:
     break;
 
   case 9:
-#line 98 "minic.y"
+#line 99 "minic.y"
     {
         (yyvsp[(1) - (4)].statement_list)->push_back(createDecl((yyvsp[(3) - (4)].str)));
         (yyval.statement_list) = (yyvsp[(1) - (4)].statement_list);
@@ -1487,14 +1488,14 @@ yyreduce:
     break;
 
   case 10:
-#line 103 "minic.y"
+#line 104 "minic.y"
     {
         (yyval.statement_list) = new std::vector<astNode*>;
         ;}
     break;
 
   case 11:
-#line 110 "minic.y"
+#line 111 "minic.y"
     {
         (yyvsp[(1) - (2)].statement_list)->push_back((yyvsp[(2) - (2)].node));
         (yyval.statement_list) = (yyvsp[(1) - (2)].statement_list);
@@ -1502,168 +1503,168 @@ yyreduce:
     break;
 
   case 12:
-#line 115 "minic.y"
+#line 116 "minic.y"
     {
         (yyval.statement_list) = new std::vector<astNode*>;
         ;}
     break;
 
   case 13:
-#line 122 "minic.y"
+#line 123 "minic.y"
     {
         (yyval.node) = createAsgn(createVar((yyvsp[(1) - (4)].str)), (yyvsp[(3) - (4)].node));
         ;}
     break;
 
   case 14:
-#line 126 "minic.y"
+#line 127 "minic.y"
     {
         (yyval.node) = createCall("print", (yyvsp[(3) - (5)].node));
         ;}
     break;
 
   case 15:
-#line 130 "minic.y"
+#line 131 "minic.y"
     {
         (yyval.node) = createRet((yyvsp[(2) - (3)].node));
         ;}
     break;
 
   case 16:
-#line 134 "minic.y"
+#line 135 "minic.y"
     {
         (yyval.node) = createIf((yyvsp[(3) - (5)].node), (yyvsp[(5) - (5)].node));
         ;}
     break;
 
   case 17:
-#line 138 "minic.y"
+#line 139 "minic.y"
     {
         (yyval.node) = createIf((yyvsp[(3) - (7)].node), (yyvsp[(5) - (7)].node), (yyvsp[(7) - (7)].node));
         ;}
     break;
 
   case 18:
-#line 142 "minic.y"
+#line 143 "minic.y"
     {
         (yyval.node) = createWhile((yyvsp[(3) - (5)].node), (yyvsp[(5) - (5)].node));
         ;}
     break;
 
   case 19:
-#line 146 "minic.y"
+#line 147 "minic.y"
     {
         (yyval.node) = (yyvsp[(1) - (1)].node);
         ;}
     break;
 
   case 20:
-#line 153 "minic.y"
+#line 154 "minic.y"
     {
         (yyval.node) = (yyvsp[(1) - (1)].node);
         ;}
     break;
 
   case 21:
-#line 157 "minic.y"
+#line 158 "minic.y"
     {
         (yyval.node) = createCall("read", NULL);
         ;}
     break;
 
   case 22:
-#line 164 "minic.y"
+#line 165 "minic.y"
     {
         (yyval.node) = createRExpr((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node), lt);
         ;}
     break;
 
   case 23:
-#line 168 "minic.y"
+#line 169 "minic.y"
     {
         (yyval.node) = createRExpr((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node), gt);
         ;}
     break;
 
   case 24:
-#line 172 "minic.y"
+#line 173 "minic.y"
     {
         (yyval.node) = createRExpr((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node), le);
         ;}
     break;
 
   case 25:
-#line 176 "minic.y"
+#line 177 "minic.y"
     {
         (yyval.node) = createRExpr((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node), ge);
         ;}
     break;
 
   case 26:
-#line 180 "minic.y"
+#line 181 "minic.y"
     {
         (yyval.node) = createRExpr((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node), eq);
         ;}
     break;
 
   case 27:
-#line 184 "minic.y"
+#line 185 "minic.y"
     {
         (yyval.node) = createRExpr((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node), neq);
         ;}
     break;
 
   case 28:
-#line 191 "minic.y"
+#line 192 "minic.y"
     {
         (yyval.node) = createBExpr((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node), add);
         ;}
     break;
 
   case 29:
-#line 195 "minic.y"
+#line 196 "minic.y"
     {
         (yyval.node) = createBExpr((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node), sub);
         ;}
     break;
 
   case 30:
-#line 199 "minic.y"
+#line 200 "minic.y"
     {
         (yyval.node) = createBExpr((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node), mul);
         ;}
     break;
 
   case 31:
-#line 203 "minic.y"
+#line 204 "minic.y"
     {
         (yyval.node) = createBExpr((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node), divide);
         ;}
     break;
 
   case 32:
-#line 207 "minic.y"
+#line 208 "minic.y"
     {
         (yyval.node) = createUExpr((yyvsp[(2) - (2)].node), uminus);
         ;}
     break;
 
   case 33:
-#line 211 "minic.y"
+#line 212 "minic.y"
     {
         (yyval.node) = (yyvsp[(2) - (3)].node);
         ;}
     break;
 
   case 34:
-#line 215 "minic.y"
+#line 216 "minic.y"
     {
         (yyval.node) = createCnst((yyvsp[(1) - (1)].num));
         ;}
     break;
 
   case 35:
-#line 219 "minic.y"
+#line 220 "minic.y"
     {
         (yyval.node) = createVar((yyvsp[(1) - (1)].str));
         ;}
@@ -1671,7 +1672,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1675 "minic.tab.c"
+#line 1676 "minic.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1885,7 +1886,7 @@ yyreturn:
 }
 
 
-#line 224 "minic.y"
+#line 225 "minic.y"
 
 
 void yyerror(char *s) {
@@ -1894,7 +1895,9 @@ void yyerror(char *s) {
 
 int main() {
     printf("Processing minic program \n\n");
-    yyparse();
-    return 0;
+    if (yyparse() != 0) {
+        return 1;
+    }
+    return semanticAnalyze(rootNode);
 }
 

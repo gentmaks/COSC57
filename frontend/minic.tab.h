@@ -82,7 +82,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 10 "minic.y"
+#line 11 "minic.y"
 {
     int num;
     char *str;

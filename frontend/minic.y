@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ast.h"
+#include "semantic.h"
 void yyerror(char *s);
 int yylex();
 astNode *rootNode;
@@ -229,6 +230,8 @@ void yyerror(char *s) {
 
 int main() {
     printf("Processing minic program \n\n");
-    yyparse();
-    return 0;
+    if (yyparse() != 0) {
+        return 1;
+    }
+    return semanticAnalyze(rootNode);
 }
