@@ -53,7 +53,9 @@
      EQ = 269,
      NEQ = 270,
      LE = 271,
-     GE = 272
+     GE = 272,
+     UMINUS = 273,
+     IFX = 274
    };
 #endif
 /* Tokens.  */
@@ -72,6 +74,8 @@
 #define NEQ 270
 #define LE 271
 #define GE 272
+#define UMINUS 273
+#define IFX 274
 
 
 
@@ -86,7 +90,7 @@ typedef union YYSTYPE
     std::vector<astNode*> *statement_list;
 }
 /* Line 1529 of yacc.c.  */
-#line 90 "minic.tab.h"
+#line 94 "minic.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
