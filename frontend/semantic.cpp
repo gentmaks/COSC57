@@ -46,6 +46,7 @@ int declareVar(const char *name, ScopeStack &scopes) {
 }
 
 int analyzeNode(astNode *node, ScopeStack &scopes);
+int analyzeBlock(astNode *node, ScopeStack &scopes, bool createScope);
 
 int analyzeStmt(astNode *node, ScopeStack &scopes) {
   if (node == nullptr) {
@@ -57,22 +58,7 @@ int analyzeStmt(astNode *node, ScopeStack &scopes) {
 
   switch (node->stmt.type) {
   case ast_block: {
-    scopes.emplace_back();
-    std::vector<astNode *> slist = *(node->stmt.block.stmt_list);
-    for (astNode *child : slist) {
-      if (child != nullptr && child->type == ast_stmt &&
-          child->stmt.type == ast_decl) {
-        if (declareVar(child->stmt.decl.name, scopes) != 0) {
-          return 1;
-        }
-        continue;
-      }
-      if (analyzeNode(child, scopes) != 0) {
-        return 1;
-      }
-    }
-    scopes.pop_back();
-    return 0;
+    return analyzeBlock(node, scopes, true);
   }
   case ast_asgn: {
     if (node->stmt.asgn.lhs != nullptr) {
@@ -137,7 +123,7 @@ int analyzeNode(astNode *node, ScopeStack &scopes) {
         return 1;
       }
     }
-    int result = analyzeNode(node->func.body, scopes);
+    int result = analyzeBlock(node->func.body, scopes, false);
     scopes.pop_back();
     return result;
   }
@@ -164,6 +150,28 @@ int analyzeNode(astNode *node, ScopeStack &scopes) {
   default:
     return 0;
   }
+}
+
+int analyzeBlock(astNode *node, ScopeStack &scopes, bool createScope) {
+  if (node == nullptr) {
+    return 0;
+  }
+  if (node->type != ast_stmt || node->stmt.type != ast_block) {
+    return analyzeNode(node, scopes);
+  }
+  if (createScope) {
+    scopes.emplace_back();
+  }
+  std::vector<astNode *> slist = *(node->stmt.block.stmt_list);
+  for (astNode *child : slist) {
+    if (analyzeNode(child, scopes) != 0) {
+      return 1;
+    }
+  }
+  if (createScope) {
+    scopes.pop_back();
+  }
+  return 0;
 }
 
 } // namespace

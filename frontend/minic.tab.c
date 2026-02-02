@@ -1894,10 +1894,16 @@ void yyerror(char *s) {
 }
 
 int main() {
-    printf("Processing minic program \n\n");
+    // printf("Processing minic program \n\n");
     if (yyparse() != 0) {
         return 1;
     }
-    return semanticAnalyze(rootNode);
+    int result = semanticAnalyze(rootNode);
+    if (!result) {
+        printf("Successful!\n");
+    }
+    else {
+        printf("Unsucessful!\n");
+    }
 }
 
