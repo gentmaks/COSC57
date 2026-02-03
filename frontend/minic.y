@@ -1,3 +1,8 @@
+/*
+Author: Gent Maksutaj
+Date: 2nd February 2026
+Description: Parser for miniC. Builds an AST and runs semantic checks.
+*/
 %{
 #include <stdlib.h>
 #include <stdio.h>
@@ -229,7 +234,6 @@ void yyerror(char *s) {
 }
 
 int main() {
-    // printf("Processing minic program \n\n");
     if (yyparse() != 0) {
         return 1;
     }
@@ -240,4 +244,5 @@ int main() {
     else {
         printf("Unsucessful!\n");
     }
+    return result;
 }

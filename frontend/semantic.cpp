@@ -1,5 +1,14 @@
+/*
+Author: Gent Maksutaj
+Date: 2nd February 2026
+Description: Implements semantic analysis for miniC.
+Checks:
+  - Variables are declared before use.
+  - No duplicate declarations in the same scope.
+Notes:
+  - Function parameters share scope with the function body block.
+*/
 #include "semantic.h"
-
 #include <cstdio>
 #include <string>
 #include <unordered_map>
@@ -10,12 +19,14 @@ namespace {
 using SymbolTable = std::unordered_map<std::string, int>;
 using ScopeStack = std::vector<SymbolTable>;
 
+// Helper Function to log error message for use of undeclared variable error
 int reportUndeclared(const char *name) {
   std::fprintf(stderr, "Semantic error: use of undeclared variable '%s'\n",
                name);
   return 1;
 }
 
+// Helper Function to log error message for duplicate declaration error.
 int reportDuplicate(const char *name) {
   std::fprintf(
       stderr,
@@ -24,6 +35,7 @@ int reportDuplicate(const char *name) {
   return 1;
 }
 
+// Helper Function to check if a variable is declared in any active scope.
 int useVar(const char *name, const ScopeStack &scopes) {
   for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
     if (it->find(name) != it->end()) {
@@ -33,6 +45,7 @@ int useVar(const char *name, const ScopeStack &scopes) {
   return reportUndeclared(name);
 }
 
+// Helper Function to declare a variable in the current scope.
 int declareVar(const char *name, ScopeStack &scopes) {
   if (scopes.empty()) {
     scopes.emplace_back();
@@ -48,6 +61,7 @@ int declareVar(const char *name, ScopeStack &scopes) {
 int analyzeNode(astNode *node, ScopeStack &scopes);
 int analyzeBlock(astNode *node, ScopeStack &scopes, bool createScope);
 
+// Helper Function to analyze a statement node and its children.
 int analyzeStmt(astNode *node, ScopeStack &scopes) {
   if (node == nullptr) {
     return 0;
@@ -108,6 +122,7 @@ int analyzeStmt(astNode *node, ScopeStack &scopes) {
   }
 }
 
+// Helper Function to analyze any AST node type.
 int analyzeNode(astNode *node, ScopeStack &scopes) {
   if (node == nullptr) {
     return 0;
@@ -152,6 +167,7 @@ int analyzeNode(astNode *node, ScopeStack &scopes) {
   }
 }
 
+// Helper Function to analyze a block with optional scope creation.
 int analyzeBlock(astNode *node, ScopeStack &scopes, bool createScope) {
   if (node == nullptr) {
     return 0;
@@ -176,6 +192,7 @@ int analyzeBlock(astNode *node, ScopeStack &scopes, bool createScope) {
 
 } // namespace
 
+// Entry point for semantic analysis of the AST.
 int semanticAnalyze(astNode *root) {
   ScopeStack scopes;
   return analyzeNode(root, scopes);

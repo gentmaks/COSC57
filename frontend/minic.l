@@ -1,3 +1,8 @@
+/*
+Author: Gent Maksutaj
+Date: 2nd February 2026
+Description: Lexer for miniC. Produces tokens for the parser.
+*/
 %{
 #include <stdlib.h>
 #include <string.h>
