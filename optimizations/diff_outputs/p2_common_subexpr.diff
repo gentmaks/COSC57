@@ -1,0 +1,25 @@
+--- /Users/gent/Desktop/compilers/optimizations/diff_outputs/p2_common_subexpr_expected_regions.ll	2026-02-14 18:18:43
++++ /Users/gent/Desktop/compilers/optimizations/diff_outputs/p2_common_subexpr_generated_regions.ll	2026-02-14 18:18:43
+@@ -5,14 +5,13 @@
+   %5 = alloca i32, align 4
+   store i32 %0, ptr %2, align 4
+   store i32 10, ptr %3, align 4
+-  %6 = load i32, ptr %3, align 4
+-  %7 = load i32, ptr %2, align 4
+-  %8 = add nsw i32 %6, %7
+-  store i32 %8, ptr %4, align 4
+-  store i32 %8, ptr %5, align 4
+-  %9 = load i32, ptr %4, align 4
+-  %10 = load i32, ptr %5, align 4
+-  %11 = add nsw i32 %9, %10
+-  ret i32 %11
++  %6 = load i32, ptr %2, align 4
++  %7 = add nsw i32 10, %6
++  store i32 %7, ptr %4, align 4
++  store i32 %7, ptr %5, align 4
++  %8 = load i32, ptr %4, align 4
++  %9 = load i32, ptr %5, align 4
++  %10 = add nsw i32 %8, %9
++  ret i32 %10
+ }
+ 
