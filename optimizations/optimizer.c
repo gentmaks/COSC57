@@ -1,16 +1,28 @@
+/*
+Author: Gent Maksutaj
+Description: This file handles all of the optimization techniques
+discussed in class
+1. Common Subexpression Elimination
+2. Constant Folding
+3. Dead Code Elimination
+4. Store Load Constant Propagation
+*/
+
+/* Including Libraries */
+
 #include "optimizer.h"
-
-#include <llvm-c/IRReader.h>
-
 #include <cstdint>
 #include <cstdio>
+#include <llvm-c/IRReader.h>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
+/* Set of Stores used in the later optimization algorithms */
 using StoreSet = std::unordered_set<int>;
 
+/* Struct containing all information about and expression */
 struct ExprValue {
   LLVMValueRef canonicalInst;
   bool isLoad;
@@ -18,6 +30,7 @@ struct ExprValue {
   unsigned loadPtrGeneration;
 };
 
+/* Struct containing basic block information */
 struct BlockData {
   LLVMBasicBlockRef bb;
   std::vector<int> preds;
@@ -27,6 +40,7 @@ struct BlockData {
   StoreSet out;
 };
 
+/* StoreSet comparator */
 static bool setEquals(const StoreSet &a, const StoreSet &b) {
   if (a.size() != b.size()) {
     return false;
@@ -38,6 +52,8 @@ static bool setEquals(const StoreSet &a, const StoreSet &b) {
   }
   return true;
 }
+
+/* LLVM IR function wrappers */
 
 static LLVMValueRef storePointerOperand(LLVMValueRef storeInst) {
   return LLVMGetOperand(storeInst, 1);
@@ -95,6 +111,7 @@ static bool areSameConstantValue(LLVMValueRef a, LLVMValueRef b) {
          LLVMConstIntGetSExtValue(a) == LLVMConstIntGetSExtValue(b);
 }
 
+/* Getting index of a basic block */
 static int blockIndexOf(const std::vector<BlockData> &blocks,
                         LLVMBasicBlockRef bb) {
   for (size_t i = 0; i < blocks.size(); i++) {
@@ -105,6 +122,7 @@ static int blockIndexOf(const std::vector<BlockData> &blocks,
   return -1;
 }
 
+/* Getting index of a store instruction */
 static int storeIndexOf(const std::vector<LLVMValueRef> &stores,
                         LLVMValueRef storeInst) {
   for (size_t i = 0; i < stores.size(); i++) {
@@ -115,6 +133,7 @@ static int storeIndexOf(const std::vector<LLVMValueRef> &stores,
   return -1;
 }
 
+/* Erasing stores which have been killed during constant propagation */
 static void eraseKilledStores(StoreSet &set, LLVMValueRef killer,
                               const std::vector<LLVMValueRef> &allStores) {
   for (auto it = set.begin(); it != set.end();) {
@@ -126,6 +145,7 @@ static void eraseKilledStores(StoreSet &set, LLVMValueRef killer,
   }
 }
 
+/* helper function to generate a string key for our instruction */
 static std::string makeExprKey(LLVMOpcode opcode, unsigned numOperands,
                                LLVMValueRef op0, LLVMValueRef op1) {
   return std::to_string(static_cast<unsigned>(opcode)) + "|" +
@@ -137,6 +157,7 @@ static std::string makeExprKey(LLVMOpcode opcode, unsigned numOperands,
              static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(op1)));
 }
 
+/* LLVM Module from file */
 LLVMModuleRef createLLVMModuleFromFile(const char *filename) {
   char *errorMessage = nullptr;
   LLVMMemoryBufferRef memoryBuffer = nullptr;
@@ -161,6 +182,11 @@ LLVMModuleRef createLLVMModuleFromFile(const char *filename) {
   return module;
 }
 
+/*
+  Performs local CSE within each basic block by reusing prior equivalent
+  instructions; loads are only reused when no intervening store to the same
+  pointer has occurred (tracked via per-pointer generation counters).
+*/
 bool runCommonSubexpressionElimination(LLVMValueRef function) {
   bool changed = false;
 
@@ -222,7 +248,10 @@ bool runCommonSubexpressionElimination(LLVMValueRef function) {
 
   return changed;
 }
-
+/*
+  Folds arithmetic instructions (add/sub/mul) whose operands are constants,
+  replacing all uses of the instruction with the computed constant value.
+*/
 bool runConstantFolding(LLVMValueRef function) {
   bool changed = false;
 
@@ -265,6 +294,10 @@ bool runConstantFolding(LLVMValueRef function) {
   return changed;
 }
 
+/*
+  Iteratively removes instructions with no uses and no side effects until
+  reaching a fixed point, since deleting one dead instruction can expose more.
+*/
 bool runDeadCodeElimination(LLVMValueRef function) {
   bool anyChange = false;
   bool changed = true;
@@ -294,6 +327,11 @@ bool runDeadCodeElimination(LLVMValueRef function) {
   return anyChange;
 }
 
+/*
+  Performs global constant propagation over memory via reaching store
+  definitions (GEN/KILL/IN/OUT), then replaces loads with a constant when all
+  reaching stores to that address agree on the same constant value.
+*/
 bool runStoreLoadConstantPropagation(LLVMValueRef function) {
   bool changed = false;
 
@@ -437,6 +475,7 @@ bool runStoreLoadConstantPropagation(LLVMValueRef function) {
   return changed;
 }
 
+/* Running all optimizations in a loop until no more optimizing could be done */
 bool optimizeFunction(LLVMValueRef function) {
   bool changed = false;
 
