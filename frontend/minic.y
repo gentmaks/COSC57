@@ -8,8 +8,10 @@ Description: Parser for miniC. Builds an AST and runs semantic checks.
 #include <stdio.h>
 #include "ast.h"
 #include "semantic.h"
+#include "../LLVM_IR_BUILDER/ir_builder.h"
 void yyerror(char *s);
 int yylex();
+int yylex_destroy();
 astNode *rootNode;
 %}
 
@@ -234,15 +236,32 @@ void yyerror(char *s) {
 }
 
 int main() {
+    LLVMModuleRef module = NULL;
     if (yyparse() != 0) {
+        yylex_destroy();
         return 1;
     }
+
+    if (rootNode == NULL) {
+        yylex_destroy();
+        return 1;
+    }
+
     int result = semanticAnalyze(rootNode);
     if (!result) {
-        printf("Successful!\n");
+        module = buildIRModule(rootNode);
+        if (module == NULL) {
+            result = 1;
+        }
     }
-    else {
-        printf("Unsucessful!\n");
+
+    if (module != NULL) {
+        LLVMPrintModuleToFile(module, "minic.ll", NULL);
+        LLVMDisposeModule(module);
     }
+
+    freeNode(rootNode);
+    yylex_destroy();
+    LLVMShutdown();
     return result;
 }
