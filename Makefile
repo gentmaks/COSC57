@@ -22,6 +22,7 @@ OUT := $(BUILD_DIR)/output.ll
 OUT_OPT := $(BUILD_DIR)/output_opt.ll
 OUT_S := $(BUILD_DIR)/output.s
 RUN_EXE := $(BUILD_DIR)/output.out
+MAIN ?= assembly_gen_tests/main.c
 
 .PHONY: all help compiler optimizer asmgen run opt asm pipeline run-native run32 clean clean-tools
 
@@ -36,8 +37,8 @@ help:
 	@echo "  make opt IN=<path/to/input.c>         # run compiler + optimizer; emits $(OUT_OPT)"
 	@echo "  make asm IN=<path/to/input.c>         # run compiler + optimizer + asm generator; emits $(OUT_S)"
 	@echo "  make pipeline IN=<path/to/input.c>    # alias of asm"
-	@echo "  make run-native IN=<path/to/input.c>  # run optimized LLVM IR with host toolchain"
-	@echo "  make run32 IN=<path/to/input.c>       # compile and run generated assembly with runtime driver"
+	@echo "  make run-native IN=<path/to/input.c> [MAIN=<path/to/main.c>]  # run optimized LLVM IR on host"
+	@echo "  make run32 IN=<path/to/input.c> [MAIN=<path/to/main.c>]       # run generated 32-bit assembly"
 	@echo "  make clean                            # remove generated outputs"
 	@echo "  make clean-tools                      # clean binaries in subprojects"
 
@@ -78,11 +79,11 @@ asm: opt $(ASMGEN)
 pipeline: asm
 
 run-native: opt
-	clang "$(OUT_OPT)" "optimizer_test_results/main.c" -o "$(RUN_EXE)"
+	clang "$(OUT_OPT)" "$(MAIN)" -o "$(RUN_EXE)"
 	"$(RUN_EXE)"
 
 run32: asm
-	clang -m32 "$(OUT_S)" "optimizer_test_results/main.c" -o "$(RUN_EXE)"
+	clang -m32 "$(OUT_S)" "$(MAIN)" -o "$(RUN_EXE)"
 	"$(RUN_EXE)"
 
 clean:

@@ -1,10 +1,9 @@
 # COSC57 Compiler Workspace
 
-This repository contains course work for COSC57 and now includes a **single source of truth Makefile** at the project root:
 
-- `gent/COSC57/Makefile`
+Clone the directory using `git clone`
 
-That root Makefile lets you build and run the compiler pipeline from one place, similar to `py/cosc057project-Compiler`.
+- The top level MAKEFILE serves as a single source of truth for the whole project.
 
 ## Requirements
 
@@ -18,7 +17,7 @@ Make sure these tools are installed and available on your `PATH`:
 
 ## Main Build Targets
 
-From `gent/COSC57`:
+From `your_root_directory/COSC57`:
 
 ```bash
 make compiler
@@ -30,7 +29,7 @@ make asmgen
 - `make optimizer` builds `optimizations/optimizer`
 - `make asmgen` builds `build/tools/asmgen`
 
-You can also build everything at once:
+(RECOMMENDED) You can also build everything at once:
 
 ```bash
 make
@@ -41,6 +40,7 @@ make
 The root Makefile uses:
 
 - `IN` for the input miniC source file
+- `MAIN` for the runtime driver file (default: `assembly_gen_tests/main.c`)
 - `build/output.ll` for raw LLVM IR
 - `build/output_opt.ll` for optimized LLVM IR
 - `build/output.s` for generated assembly
@@ -102,13 +102,21 @@ This writes:
 make run32 IN=frontend/test_mine_good.c
 ```
 
-This links `build/output.s` with `optimizer_test_results/main.c`, builds:
+This links `build/output.s` with `assembly_gen_tests/main.c` (or your `MAIN=...` override), builds:
 
 - `build/output.out`
 
 and executes it.
 
 Note: `run32` needs a working x86 32-bit toolchain (`clang -m32`), which is commonly available on Linux x86 environments and may not work on macOS arm64.
+
+For host-native execution, you can also use:
+
+```bash
+make run-native IN=assembly_gen_tests/square.c
+```
+
+This target also uses `MAIN`, with the same default (`assembly_gen_tests/main.c`).
 
 ## Running `assembly_gen_tests` Programs
 
@@ -117,6 +125,12 @@ Use a single `.c` file for `IN` (not a directory):
 ```bash
 make run32 IN=assembly_gen_tests/square.c
 make run32 IN=assembly_gen_tests/sum_n.c
+```
+
+To use a different driver file:
+
+```bash
+make run32 IN=assembly_gen_tests/square.c MAIN=optimizer_test_results/main.c
 ```
 
 Valid form:
@@ -141,24 +155,13 @@ make compiler optimizer asmgen
 make run32 IN=assembly_gen_tests/square.c
 ```
 
-This avoids cross-platform binary issues (for example, trying to run a macOS-built `frontend/minic` on Linux).
 
-## Common Parse Errors in `assembly_gen_tests`
+## Parse errors in `assembly_gen_tests`
 
 The frontend parser implements a restricted miniC grammar. Some C constructs are intentionally not accepted.
 
 - Extra semicolon after a statement can fail parse (`prod = 1;;` in `assembly_gen_tests/fact.c` should be `prod = 1;`)
 - Declaration with initializer is not supported (`int max = 0;` in `assembly_gen_tests/max_n.c` should be split into `int max;` then `max = 0;`)
-
-If parsing fails, check the input program against the grammar used by `frontend/minic.y`.
-
-### 5) Run on your host architecture (recommended on macOS arm64)
-
-```bash
-make run-native IN=frontend/test_mine_good.c
-```
-
-This compiles `build/output_opt.ll` together with `optimizer_test_results/main.c` and runs the result on the current machine architecture.
 
 ## Helpful Commands
 
