@@ -1,4 +1,4 @@
-; ModuleID = 'minic_module'
+; ModuleID = 'build/output.ll'
 source_filename = "minic_module"
 target triple = "x86_64-pc-linux-gnu"
 
@@ -29,13 +29,11 @@ entry:
   store i32 30, ptr %c_7, align 4
   store i32 20, ptr %a_8, align 4
   store i32 20, ptr %b_9, align 4
-  %1 = load i32, ptr %a_8, align 4
-  %2 = icmp slt i32 %1, 30
-  br i1 %2, label %if_t, label %if_f
+  %1 = icmp slt i32 20, 30
+  br i1 %1, label %if_t, label %if_f
 
 ret:                                              ; preds = %after_ret, %if_f
-  %retval = load i32, ptr %retval.addr, align 4
-  ret i32 %retval
+  ret i32 1
 
 if_t:                                             ; preds = %entry
   store i32 20, ptr %a_10, align 4
