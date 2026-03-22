@@ -51,6 +51,12 @@ Default input:
 frontend/test_mine_good.c
 ```
 
+For assembly backend programs, use files in:
+
+```bash
+assembly_gen_tests/
+```
+
 ### 1) Run frontend compiler only
 
 ```bash
@@ -103,6 +109,48 @@ This links `build/output.s` with `optimizer_test_results/main.c`, builds:
 and executes it.
 
 Note: `run32` needs a working x86 32-bit toolchain (`clang -m32`), which is commonly available on Linux x86 environments and may not work on macOS arm64.
+
+## Running `assembly_gen_tests` Programs
+
+Use a single `.c` file for `IN` (not a directory):
+
+```bash
+make run32 IN=assembly_gen_tests/square.c
+make run32 IN=assembly_gen_tests/sum_n.c
+```
+
+Valid form:
+
+```bash
+make run32 IN=assembly_gen_tests/<file>.c
+```
+
+Invalid form (directory path):
+
+```bash
+make run32 IN=assembly_gen_tests/
+```
+
+### Recommended flow on Linux server
+
+Rebuild tool binaries on the server before running tests:
+
+```bash
+make clean-tools
+make compiler optimizer asmgen
+make run32 IN=assembly_gen_tests/square.c
+```
+
+This avoids cross-platform binary issues (for example, trying to run a macOS-built `frontend/minic` on Linux).
+
+## Common Parse Errors in `assembly_gen_tests`
+
+The frontend parser implements a restricted miniC grammar. Some C constructs are intentionally not accepted.
+
+- Extra semicolon after a statement can fail parse (`prod = 1;;` in `assembly_gen_tests/fact.c` should be `prod = 1;`)
+- Declaration with initializer is not supported (`int max = 0;` in `assembly_gen_tests/max_n.c` should be split into `int max;` then `max = 0;`)
+
+If parsing fails, check the input program against the grammar used by `frontend/minic.y`.
 
 ### 5) Run on your host architecture (recommended on macOS arm64)
 
